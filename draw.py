@@ -4,20 +4,56 @@ import math
 
 
 def add_box( points, x, y, z, width, height, depth ):
-    return 0
+    add_edge( points, x, y, z, x+width, y, z )
+    add_edge( points, x+width, y, z, x+width, y+height, z )
+    add_edge( points, x+width, y+height, z, x, y+height, z )
+    add_edge( points, x, y+height, z, x, y, z )
+    add_edge( points, x, y, z+depth, x+width, y, z+depth )
+    add_edge( points, x+width, y, z+depth, x+width, y+height, z+depth )
+    add_edge( points, x+width, y+height, z+depth, x, y+height, z+depth )
+    add_edge( points, x, y+height, z+depth, x, y, z+depth )
+    add_edge( points, x, y, z, x, y, z+depth )
+    add_edge( points, x+width, y, z, x+width, y, z+depth )
+    add_edge( points, x+width, y+height, z, x+width, y+height, z+depth )
+    add_edge( points, x, y+height, z, x, y+height, z+depth )
 
-def add_sphere( points, cx, cy, cz, r, step ):
-    return 0
 
 def generate_sphere( points, cx, cy, cz, r, step ):
-    return 0
+    p = 0
+    while p < 1:
+        t = 0
+        while t < 1:
+            x = r*math.cos(math.pi*t) + cx
+            y = r*math.sin(math.pi*t)*math.cos(2*p*math.pi) + cy
+            z = r*math.sin(math.pi*t)*math.sin(2*p*math.pi) + cz
+            add_point(points, x, y, z)
+            t+=step
+        p+=step
 
-def add_torus( points, cx, cy, cz, r0, r1, step ):
-    return 0
+def add_sphere( points, cx, cy, cz, r, step ):
+    sphere_matrix = []
+    generate_sphere(sphere_matrix, cx, cy, cz, r, step)
+    for x in sphere_matrix:
+        add_edge(points, x[0], x[1], x[2], x[0], x[1], x[2])
+
 
 def generate_torus( points, cx, cy, cz, r0, r1, step ):
-    return 0
+    p = 0
+    while p < 1:
+        t = 0
+        while t < 1:
+            x = r0*math.cos(2*math.pi*t) + cx
+            y = math.cos(2*math.pi*p)*(r0*math.sin(2*t*math.pi)+r1) + cy
+            z = math.sin(2*math.pi*p)*(r0*math.sin(2*t*math.pi)+r1) + cz
+            add_point(points, x, y, z)
+            t+=step
+        p+=step
 
+def add_torus( points, cx, cy, cz, r0, r1, step ):
+    torus_matrix = []
+    generate_torus(torus_matrix, cx, cy, cz, r0, r1, step)
+    for x in torus_matrix:
+        add_edge(points, x[0], x[1], x[2], x[0], x[1], x[2])
 
 def add_circle( points, cx, cy, cz, r, step ):
     x0 = r + cx
@@ -25,7 +61,7 @@ def add_circle( points, cx, cy, cz, r, step ):
 
     t = step
     while t<= 1:
-        
+
         x = r * math.cos( 2 * math.pi * t ) + cx
         y = r * math.sin( 2 * math.pi * t ) + cy
 
@@ -38,10 +74,10 @@ def add_circle( points, cx, cy, cz, r, step ):
 def add_curve( points, x0, y0, x1, y1, x2, y2, x3, y3, step, curve_type ):
     xcoefs = generate_curve_coefs( x0, x1, x2, x3, curve_type )
     ycoefs = generate_curve_coefs( y0, y1, y2, y3, curve_type )
-        
+
     t =  step
     while t <= 1:
-        
+
         x = xcoefs[0][0] * t * t * t + xcoefs[0][1] * t * t + xcoefs[0][2] * t + xcoefs[0][3]
         y = ycoefs[0][0] * t * t * t + ycoefs[0][1] * t * t + ycoefs[0][2] * t + ycoefs[0][3]
 
@@ -53,7 +89,7 @@ def add_curve( points, x0, y0, x1, y1, x2, y2, x3, y3, step, curve_type ):
 def draw_lines( matrix, screen, color ):
     if len( matrix ) < 2:
         print "Need at least 2 points to draw a line"
-        
+
     p = 0
     while p < len( matrix ) - 1:
         draw_line( screen, matrix[p][0], matrix[p][1],
@@ -80,7 +116,7 @@ def draw_line( screen, x0, y0, x1, y1, color ):
         tmp = y0
         y0 = y1
         y1 = tmp
-    
+
     if dx == 0:
         y = y0
         while y <= y1:
@@ -135,4 +171,3 @@ def draw_line( screen, x0, y0, x1, y1, color ):
                 d = d - dy
             y = y + 1
             d = d + dx
-
